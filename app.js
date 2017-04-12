@@ -19,6 +19,7 @@
 var express = require('express'); // app server
 var bodyParser = require('body-parser'); // parser for post requests
 var Conversation = require('watson-developer-cloud/conversation/v1'); // watson sdk
+var Aerospike = require('aerospike');
 
 var app = express();
 
@@ -93,5 +94,13 @@ function updateMessage(input, response) {
   response.output.text = responseText;
   return response;
 }
+
+
+require('./routes/conversation')(app);
+require('./routes/speech-to-text')(app);
+
+// error-handler settings
+// require('./config/error-handler')(app);
+
 
 module.exports = app;

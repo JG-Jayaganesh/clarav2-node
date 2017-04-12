@@ -15,10 +15,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/watson-developer-cloud/conversation-simple.git"
+    "url": "git+https://github.com/watson-developer-cloud/conversation-simple.git"
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "aerospike": "^2.5.1",
     "body-parser": "^1.15.2",
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
@@ -37,5 +38,13 @@
   "engines": {
     "node": ">= 6.9.x",
     "npm": "> 3.10.x"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/watson-developer-cloud/conversation-simple/issues"
+  },
+  "homepage": "https://github.com/watson-developer-cloud/conversation-simple#readme",
+  "directories": {
+    "test": "test"
+  },
+  "author": ""
 }

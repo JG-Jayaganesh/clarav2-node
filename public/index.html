@@ -1,44 +1,167 @@
 <html>
-<head>
-  <base href="/">
-  <title>Conversation Chat App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta property="og:image" content="conversation.svg" />
-  <meta property="og:title" content="Conversation Chat Simple" />
-  <meta property="og:description" content="Sample application that shows how to use the Conversation API to identify user intents" />
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="css/app.css">
-</head>
-<body>
-  <div id="view-change-button" class="button" onclick="PayloadPanel.togglePanel(event, this)">
-    <img class="option full" src="../img/Chat Button.png">
-    <img class="option not-full" src="../img/Code Button.png">
-  </div>
-  <div id="contentParent" class="responsive-columns-wrapper">
-    <div id="chat-column-holder" class="responsive-column content-column">
-      <div class="chat-column">
-        <div id="scrollingChat"></div>
-        <label for="textInput" class="inputOutline">
-          <input id="textInput" class="input responsive-column"
-            placeholder="Type something" type="text"
-            onkeydown="ConversationPanel.inputKeyDown(event, this)">
-        </label>
-      </div>
-    </div>
-    <div id="payload-column" class="fixed-column content-column">
-      <div id="payload-initial-message">
-        Type something to see the output
-      </div>
-      <div id="payload-request" class="payload"></div>
-      <div id="payload-response" class="payload"></div>
-    </div>
-  </div>
 
-  <script src="js/common.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/conversation.js"></script>
-  <script src="js/payload.js"></script>
-  <script src="js/global.js"></script>
+<head>
+
+    <title>Conversation Chat App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta property="og:image" content="conversation.svg" />
+    <meta property="og:title" content="CLARA" />
+    <meta property="og:description" content="CLARA Virtual agent" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="css/jquery.bxslider.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style type="text/css">
+
+    </style>
+
+</head>
+
+<body>
+    <div id="mainBody">
+        <div id="innerBody">
+            <!--<div class="sliderBlock">
+    <ul class="bxslider">
+          <li><img src="images/img1.jpg" alt="msrbackground"></li>
+            <li><img src="images/img2.jpg" alt="msrbackground"></li>
+            <li><img src="images/img3.jpg" alt="msrbackground"></li>
+        </ul>
+    </div>-->
+
+            <div id="view-change-button" class="button">
+                <!--onclick="PayloadPanel.togglePanel(event, this)">-->
+                <!--<img class="option full" src="../img/Chat Button.png">
+        <img class="option not-full" src="../img/Code Button.png">-->
+            </div>
+            <div id="contentParent" class="responsive-columns-wrapper">
+                <div class="mercedesLogo"><img src="images/Mercedes-Benz-logo.png" alt="Mercedes-Benz-logo"></div>
+                <div id="chat-column-holder" class="responsive-column content-column">
+                    <div class="chat-column">
+                        <div id="scrollingChat"></div>
+                        <label for="textInput" class="inputOutline">
+                  <input id="textInput" class="input responsive-column"
+                    placeholder="Type something" type="text"
+                    onkeydown="ConversationPanel.inputKeyDown(event, this)">
+                </label>
+                    </div>
+                </div>
+                <div id="div_avatar"></div>
+                <div class="writeHere">T</div>
+                <div id="input-mic" class="inactive-mic" align="center" onclick="STTModule.micON()"></div>
+                <div id="input-text" class="active-text" align="center" onclick="textON()">T</div>
+
+
+                <!--<div id="input-mic-holder" align="center">
+
+        </div>-->
+                <!--<div id="payload-column" class="fixed-column content-column collapse">
+
+          <div id="payload-initial-message">
+            Type something to see the output
+          </div>
+          <div id="payload-request" class="payload"></div>
+          <div id="payload-response" class="payload"></div>
+        </div>-->
+            </div>
+            <div id="output-audio" class="audio-on" onclick="TTSModule.toggle()" value="ON"></div>
+            <!--<label for="user-input" class="input-outline responsive-column">
+                    <input id="user-input" type="text" placeholder="Type something, e.g. “Turn the headlights on”">
+                  </label>-->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+            <!--<script type="text/javascript" src="https://www.livingactor.com/AvatarAPI/js/jquery-1.5.1.min.js"></script>
+    <script type="text/javascript" src="https://www.livingactor.com/AvatarAPI/js/jquery-ui-1.8.11.custom.min.js"></script>
+    <script type="text/javascript" src="https://www.livingactor.com/AvatarAPI/js/encode64.js"></script>-->
+            <script src="https://livingactor_us.s3.amazonaws.com/sequences/js/LivingActorAvatar.min.js"></script>
+            <script src="lib/watson-speech.min.js"></script>
+            <!--<script src="js/con+v-api.js"></script>-->
+            <script src="lib/speech-to-text.js"></script>
+            <!--<script src="lib/text-to-speech.js"></script>-->
+            <script src="js/common.js"></script>
+            <script src="js/api.js"></script>
+            <script src="js/conversation.js"></script>
+            <!--<script src="js/payload.js"></script>-->
+            <script src="js/global.js"></script>
+            <script src="js/jquery.bxslider.min.js"></script>
+            <script>
+                                                             function textON() {
+                                                                 var micdata = document.getElementById('input-mic');
+                                                                 var textdata = document.getElementById('input-text');
+                                                                 textdata.setAttribute('class', 'active-text');
+                                                                 micdata.setAttribute('class', 'inactive-mic');
+
+                                                             }
+
+                                                             // var LA_API = new LivingActor.AvatarAPI({
+                                                             //   avatar: "http://livingactor_us.s3.amazonaws.com/sequences/zil/Rebecca_Business_Body34_320",		//avatar path
+                                                             //   progessivDL: true,
+                                                             //   autoLoad: true,
+                                                             //   voice: "tyler22k",
+                                                             //   key: "SEQAPI-cG4XFsvPl-Xh2FKGgPCS6", onTTSError: function (target, type, parameters) {
+                                                             //     target.warn("TTS Error", parameters);
+                                                             //   },
+                                                             //   onLoadStart: function () {
+                                                             //     $("#div_id").html("Loading...");
+                                                             //   },
+                                                             //   onPregenReady: function (target, type, parameters) {
+                                                             //     // run -> LA_API.runPreGeneratedTTS(parameters.ref);
+                                                             //   },
+                                                             //   onLoadComplete: function (event) {
+                                                             //     switch (event) {
+                                                             //       case LivingActor.AvatarAPI.EVENT_AvatarReady: break;//... Minimum set of avatar has been loaded
+                                                             //       case LivingActor.AvatarAPI.EVENT_AvatarComplete: break;//... All avatar's animations has been loaded
+                                                             //     }
+                                                             //   }
+                                                             // }
+                                                             // );
+                                                             var LA_API = new LivingActor.AvatarAPI(
+                                                                 {
+                                                                     avatar: "https://livingactor_us.s3.amazonaws.com/sequences/zil/Rebecca_Business_Body34_320"		//avatar path
+                                                                     , soundSwfLocation: "https://livingactor_us.s3.amazonaws.com/sequences/js/" //resource path
+                                                                     , divid: "#div_avatar"						   // html avatar host target
+                                                                     , progessivDL: true						   // enable progressive download
+                                                                     , autoLoad: true							   // Auto start avatar loading, ohterwise call LA_API.load();
+                                                                     , voice: "karen22k" // TTS Voice
+                                                                     , key: "SEQAPI-cG4XFsvPl-Xh2FKGgPCS6"	   // Living Actor Client Key
+                                                                     , onTTSError: function (target, type, parameters) {
+                                                                         target.warn("TTS Error", parameters);
+                                                                     }
+                                                                     , onLoadStart: function () {
+                                                                     }
+                                                                     , onLoadComplete: function (event) {
+                                                                         switch (event) {
+                                                                             case LivingActor.AvatarAPI.EVENT_AvatarReady:
+                                                                                 //... 		Minimum set of avatar has been loaded
+                                                                                 break;
+                                                                             case LivingActor.AvatarAPI.EVENT_AvatarComplete:
+                                                                                 //...		All avatar's animations has been loaded
+                                                                                 break;
+                                                                         }
+                                                                     }
+                                                                     , onSoundLoaded: function () {
+
+                                                                     }
+                                                                     , onPlayEnd: function () {
+                                                                         //On play end
+                                                                     }
+                                                                     , onPregenReady: function (target, type, parameters) {
+                                                                         // run -> LA_API.runPreGeneratedTTS(parameters.ref);
+                                                                     }
+                                                                 }
+                                                             );
+            </script>
+            <script type="text/javascript">
+                                                         $(document).ready(function () {
+                                                             //  $('.bxslider').bxSlider({
+                                                             // auto: true,
+                                                             // hideControlOnEnd: true,
+                                                             /// autoScaleSlider:false,
+                                                             //autoHeight: false
+                                                             //});
+                                                         });
+            </script>
+
+        </div>
+    </div>
 </body>
+
 </html>
