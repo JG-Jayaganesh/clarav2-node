@@ -5,3 +5,7 @@ temp/
 coverage
 .env
 npm-debug.log
+todos
+.gitignore
+db-backup
+notes

@@ -1,5 +1,4 @@
 // The Api module is designed to handle all interactions with the server
-
 var Api = (function () {
   var requestPayload;
   var responsePayload;

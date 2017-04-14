@@ -1,7 +1,5 @@
 <html>
-
 <head>
-
     <title>Conversation Chat App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,12 +9,8 @@
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="css/jquery.bxslider.css">
     <link rel="stylesheet" href="css/app.css">
-    <style type="text/css">
-
-    </style>
-
+    <style type="text/css"></style>
 </head>
-
 <body>
     <div id="mainBody">
         <div id="innerBody">
@@ -46,7 +40,7 @@
                     </div>
                 </div>
                 <div id="div_avatar"></div>
-                <div class="writeHere">T</div>
+                <div class="writeHere"></div>
                 <div id="input-mic" class="inactive-mic" align="center" onclick="STTModule.micON()"></div>
                 <div id="input-text" class="active-text" align="center" onclick="textON()">T</div>
 
@@ -83,13 +77,12 @@
             <script src="js/global.js"></script>
             <script src="js/jquery.bxslider.min.js"></script>
             <script>
-                                                             function textON() {
-                                                                 var micdata = document.getElementById('input-mic');
-                                                                 var textdata = document.getElementById('input-text');
-                                                                 textdata.setAttribute('class', 'active-text');
-                                                                 micdata.setAttribute('class', 'inactive-mic');
-
-                                                             }
+               function textON() {
+                   var micdata = document.getElementById('input-mic');
+                   var textdata = document.getElementById('input-text');
+                   textdata.setAttribute('class', 'active-text');
+                   micdata.setAttribute('class', 'inactive-mic');
+               }
 
                                                              // var LA_API = new LivingActor.AvatarAPI({
                                                              //   avatar: "http://livingactor_us.s3.amazonaws.com/sequences/zil/Rebecca_Business_Body34_320",		//avatar path
@@ -149,17 +142,6 @@
                                                                  }
                                                              );
             </script>
-            <script type="text/javascript">
-                                                         $(document).ready(function () {
-                                                             //  $('.bxslider').bxSlider({
-                                                             // auto: true,
-                                                             // hideControlOnEnd: true,
-                                                             /// autoScaleSlider:false,
-                                                             //autoHeight: false
-                                                             //});
-                                                         });
-            </script>
-
         </div>
     </div>
 </body>

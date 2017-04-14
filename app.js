@@ -19,7 +19,9 @@
 var express = require('express'); // app server
 var bodyParser = require('body-parser'); // parser for post requests
 var Conversation = require('watson-developer-cloud/conversation/v1'); // watson sdk
-var Aerospike = require('aerospike');
+var aerospike = require('./db/aerospike.js');
+var processUserInput = require('./process-user-input.js').processUserInput;
+var dbStatusCode = 0;
 
 var app = express();
 
@@ -53,14 +55,52 @@ app.post('/api/message', function(req, res) {
     context: req.body.context || {},
     input: req.body.input || {}
   };
+  //console.log(payload);
+  if(payload.context.customer){
+    console.log('get number');
+    var updatePayload = function(customer_data){
+      if(typeof customer_data !== 'undefined' && customer_data.length>0){
+        customer_data = customer_data[0];
+        var purchase_option = customer_data.payment_type;
+        //console.log(purchase_option);
+        payload.input.text = purchase_option;
+      } else {
+        // don't update the payload
+      }
+      // Send the input to the conversation service
+      conversation.message(payload, function(err, data) {
+        if (err) {
+          console.log('responsed with error!');
+          console.log(payload);
+          console.log(err);
+          return res.status(err.code || 500).json(err);
+        }
 
-  // Send the input to the conversation service
-  conversation.message(payload, function(err, data) {
-    if (err) {
-      return res.status(err.code || 500).json(err);
-    }
-    return res.json(updateMessage(payload, data));
-  });
+        console.log('got a response!');
+        console.log(data);
+        console.log(payload);
+        return res.json(updateMessage(payload, data));
+      });
+    };
+
+    processUserInput.init(payload, updatePayload);
+  } else {
+    console.log('proceed conversation');
+    // Send the input to the conversation service
+    conversation.message(payload, function(err, data) {
+      if (err) {
+        console.log('responsed with error!');
+        console.log(payload);
+        console.log(err);
+        return res.status(err.code || 500).json(err);
+      }
+
+      console.log('got a response!');
+      console.log(data);
+      console.log(payload);
+      return res.json(updateMessage(payload, data));
+    });
+  }
 });
 
 /**
@@ -96,11 +136,50 @@ function updateMessage(input, response) {
 }
 
 
+// Establish connection to the cluster
+aerospike.connect(function(error) {
+    if (error) {
+        // handle failure
+        dbStatusCode = error.code
+        console.log('Connection to Aerospike cluster failed!')
+    } else {
+        // handle success
+        console.log('Connection to Aerospike cluster succeeded!')
+    }
+});
+
+// Setup default/home route
+// app.get('/', function(req, res) {
+//     res.send('<div><form action="/write"><label>Enter your name:</label><input type="text" name="name"/><input type="submit"></input></form></div>')
+// })
+// // Setup write route
+// app.get('/write', function(req, res) {
+//     if (dbStatusCode === 0) {
+//         aerospike.writeRecord('Hello', req.query.name, function(error, result) {
+//             if (error) {
+//                 // handle failure
+//                 res.send(error.message)
+//             } else {
+//                 // handle success
+//                 aerospike.readRecord('Hello', function(error, result) {
+//                     if (error) {
+//                         // handle failure
+//                     } else {
+//                         // handle success
+//                     }
+//                     res.send(result)
+//                 })
+//             }
+//         })
+//     } else {
+//         res.send('Connection to Aerospike cluster failed!')
+//     }
+// })
+
 require('./routes/conversation')(app);
 require('./routes/speech-to-text')(app);
 
 // error-handler settings
 // require('./config/error-handler')(app);
-
 
 module.exports = app;
