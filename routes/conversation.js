@@ -1,20 +1,8 @@
-/**
- * Copyright 2016 IBM Corp. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+'use strict';
 
 const watson = require('watson-developer-cloud'); // watson sdk
+const processUserInput = require('../lib/process-user-input.js');
+const clarav2Session = require('../lib/clarav2-session.js');
 
 // Create the service wrapper
 const conversation = watson.conversation({
@@ -25,6 +13,35 @@ const conversation = watson.conversation({
   version_date: '2016-10-21',
   version: 'v1'
 });
+
+const conversationReponse = function(req, res, next){
+    const workspace = process.env.WORKSPACE_ID || '<workspace-id>';
+    if (!workspace || workspace === '<workspace-id>') {
+      return res.json({
+        output: {
+          text: 'The app has not been configured with a <b>WORKSPACE_ID</b> environment variable. Please refer to the ' +
+            '<a href="https://github.com/watson-developer-cloud/conversation-simple">README</a> ' +
+            'documentation on how to set this variable. <br>' +
+            'Once a workspace has been defined the intents may be imported from ' +
+            '<a href="https://github.com/watson-developer-cloud/conversation-simple/blob/master/training/car_workspace.json">here</a> ' +
+            'in order to get a working application.'
+        }
+      });
+    }
+    const payload = {
+      workspace_id: workspace,
+      context: req.body.context || {},
+      input: req.body.input || {}
+    };
+    const userInputPayload = {
+      payload: payload,
+      request: req,
+      response: res,
+      next: next
+    }
+    processUserInput.init(userInputPayload, callConversationService);
+    return next;
+}
 
 /**
  * Updates the response text using the intent confidence
@@ -58,35 +75,42 @@ const updateMessage = (input, response) => {
   return response;
 };
 
+const messageCallback = function(err, data){
+  if (error)
+    return next(error);
+  // save conversation-id if not exist
+  if(req.sess[data.context.conversation_id] == undefined){
+    clarav2Session.setConversation();
+  }
+
+  //return res.status(err.code || 500).json(err);
+  return res.json(updateMessage(conversationPayload, data));
+}
+
+const callConversationService = function(payload){
+  const conversationPayload = payload.payload;
+  const req = payload.request;
+  const res = payload.response;
+  const next = payload.next;
+
+  console.log('processed payload');
+  console.log(conversationPayload);
+
+  //req.session.put();
+  // Send the input to the conversation service
+  conversation.message(conversationPayload, (err, data) => {
+    if (err)
+      return next(err);
+    // save conversation-id if not exist
+    if(req.session[data.context.conversation_id] == undefined){
+      clarav2Session.setConversation(req, data.context.conversation_id);
+    }
+
+    //return res.status(err.code || 500).json(err);
+    return res.json(updateMessage(conversationPayload, data));
+  });
+}
 
 module.exports = function(app) {
-
-  app.post('/api/message', (req, res, next) => {
-    const workspace = process.env.WORKSPACE_ID || '<workspace-id>';
-    if (!workspace || workspace === '<workspace-id>') {
-      return res.json({
-        output: {
-          text: 'The app has not been configured with a <b>WORKSPACE_ID</b> environment variable. Please refer to the ' +
-            '<a href="https://github.com/watson-developer-cloud/conversation-simple">README</a> ' +
-            'documentation on how to set this variable. <br>' +
-            'Once a workspace has been defined the intents may be imported from ' +
-            '<a href="https://github.com/watson-developer-cloud/conversation-simple/blob/master/training/car_workspace.json">here</a> ' +
-            'in order to get a working application.'
-        }
-      });
-    }
-    const payload = {
-      workspace_id: workspace,
-      context: req.body.context || {},
-      input: req.body.input || {}
-    };
-
-    // Send the input to the conversation service
-    conversation.message(payload, (error, data) => {
-      if (error) {
-        return next(error);
-      }
-      return res.json(updateMessage(payload, data));
-    });
-  });
+  app.post('/api/message', conversationReponse);
 };

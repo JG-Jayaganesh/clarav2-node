@@ -1,9 +1,9 @@
-var Aerospike = require('aerospike');
-var aerospikeConfig = require('../config/aerospike_config.js').aerospikeConfig();
-var aerospikeDBParams = require('../config/aerospike_config.js').aerospikeDBParams({nameSpace:'dev',set_name:'customer_data'});
+const Aerospike = require('aerospike');
+const aerospikeConfig = require('../config/aerospike_config.js').aerospikeConfig();
+const aerospikeDBParams = require('../config/aerospike_config.js').aerospikeDBParams({nameSpace:'dev',set_name:'customer_data'});
 
 const client = Aerospike.client(aerospikeConfig);
-var filter = Aerospike.filter;
+const filter = Aerospike.filter;
 
 // Establish connection to the cluster
 exports.connect = function (callback) {
@@ -49,27 +49,28 @@ exports.readRecord = function (set, k, callback) {
  })
 };
 
-exports.queryRecord = function(nameSpace, set, fields, filterKey, filterVal, callback){
-  console.log(filterKey);
-  console.log(filterVal);
-  var vehicle_no = parseInt(filterVal);
-    var query = client.query('dev', 'customer_data', {}), resultSet = [];
+exports.queryRecord = function(nameSpace, set, fields, filterKey, filterVal, payload, callback){
+    if(filterKey=='vehicle_no'){
+      filterVal = parseInt(filterVal);
+    }
+    //console.log(fields);
+    var query = client.query('dev', set, {}), resultSet = [];
     query.select(fields);
-    query.where(Aerospike.filter.equal(filterKey, vehicle_no));
+    query.where(Aerospike.filter.equal(filterKey, filterVal));
     var stream = query.foreach();
     //console.log(stream);
-    stream.on('error', function(error){
+    stream.on('error', (error) => {
       console.log('ae error');
-      //console.error(error)
+      console.error(error)
       throw error
-    })
-    stream.on('data', function(record) {
-      console.log('ae record');
+    });
+    stream.on('data', (record)=> {
+      //console.log('ae record');
       //console.info(record);
       resultSet.push(record);
-    })
-    stream.on('end', function(){
-      console.log('ae close');
-      callback(resultSet);
+    });
+    stream.on('end', ()=>{
+      //console.log('ae close');
+      callback(payload, resultSet);
     });
 };
