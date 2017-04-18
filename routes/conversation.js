@@ -4,6 +4,8 @@ const watson = require('watson-developer-cloud'); // watson sdk
 const processUserInput = require('../lib/process-user-input.js');
 const clarav2Session = require('../lib/clarav2-session.js');
 
+let reqPayload = "";
+
 // Create the service wrapper
 const conversation = watson.conversation({
   // If unspecified here, the CONVERSATION_USERNAME and CONVERSATION_PASSWORD env properties will be checked
@@ -75,12 +77,16 @@ const updateMessage = (input, response) => {
   return response;
 };
 
-const messageCallback = function(err, data){
-  if (error)
-    return next(error);
+const messageCallback = (err, data) => {
+  const conversationPayload = reqPayload.payload;
+  let sess = reqPayload.request.session;
+  const res = reqPayload.response;
+  if (err)
+    return next(err);
+
   // save conversation-id if not exist
-  if(req.sess[data.context.conversation_id] == undefined){
-    clarav2Session.setConversation();
+  if(sess[data.context.conversation_id] == undefined){
+    clarav2Session.setConversation(reqPayload.request, data.context.conversation_id);
   }
 
   //return res.status(err.code || 500).json(err);
@@ -89,26 +95,13 @@ const messageCallback = function(err, data){
 
 const callConversationService = function(payload){
   const conversationPayload = payload.payload;
-  const req = payload.request;
-  const res = payload.response;
-  const next = payload.next;
+  reqPayload = payload;
 
   console.log('processed payload');
   console.log(conversationPayload);
 
-  //req.session.put();
   // Send the input to the conversation service
-  conversation.message(conversationPayload, (err, data) => {
-    if (err)
-      return next(err);
-    // save conversation-id if not exist
-    if(req.session[data.context.conversation_id] == undefined){
-      clarav2Session.setConversation(req, data.context.conversation_id);
-    }
-
-    //return res.status(err.code || 500).json(err);
-    return res.json(updateMessage(conversationPayload, data));
-  });
+  conversation.message(conversationPayload, messageCallback);
 }
 
 module.exports = function(app) {
