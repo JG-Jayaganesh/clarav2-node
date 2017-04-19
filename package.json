@@ -28,6 +28,7 @@
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
     "keras-js": "^0.1.0",
+    "ndarray": "^1.0.18",
     "watson-developer-cloud": "^2.8.1"
   },
   "devDependencies": {
