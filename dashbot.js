@@ -44,7 +44,7 @@ function ask(question) {
         platform: 'generic',
         //apiKey: process.env.DASHBOT_API_KEY_GENERIC,
         apiKey: DASHBOT_API_KEY_GENERIC,
-        v: version
+	v: version
       },
       method: 'POST',
       json: {
@@ -61,3 +61,4 @@ function ask(question) {
 }
 
 ask('Tell me your thoughts: ');
+
