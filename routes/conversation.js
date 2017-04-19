@@ -1,8 +1,12 @@
 'use strict';
 
 const watson = require('watson-developer-cloud'); // watson sdk
+
 const processUserInput = require('../lib/process-user-input.js');
+const processClaraResponse = require('../lib/process-clara-response.js');
 const clarav2Session = require('../lib/clarav2-session.js');
+
+let reqPayload = "";
 
 // Create the service wrapper
 const conversation = watson.conversation({
@@ -75,40 +79,48 @@ const updateMessage = (input, response) => {
   return response;
 };
 
-const messageCallback = function(err, data){
-  if (error)
-    return next(error);
-  // save conversation-id if not exist
-  if(req.sess[data.context.conversation_id] == undefined){
-    clarav2Session.setConversation();
-  }
-
+const returnResponse = function(err, res, data){
+  console.log('processed response');
+  // if (err!=={} && err != undefined){
+  //   console.log(err);
+  //   return res.json(err);
+  // }
+  //console.log('0000000000FINAL RESPONSE00000000000');
+  console.log(data.resData);
+  let payload = data.payload;
+  let output = data.resData;
   //return res.status(err.code || 500).json(err);
-  return res.json(updateMessage(conversationPayload, data));
+  return res.json(updateMessage(payload, output));
 }
 
-const callConversationService = function(payload){
+const messageCallback = (err, data) => {
+  const conversationPayload = reqPayload.payload;
+  let sess = reqPayload.request.session;
+  const res = reqPayload.response;
+  reqPayload.resData = data;
+  console.log('-----from watson api-----------');
+  console.log(data);
+  if(data!=undefined){
+    // save conversation-id if not exist
+    if(data.context != undefined && sess['conversation-id'] != undefined){
+      console.log('session created!');
+      //console.log(reqPayload.request.session);
+      clarav2Session.setConversation(reqPayload.request, data.context.conversation_id);
+    }
+  }
+
+  processClaraResponse.init(reqPayload, returnResponse);
+}
+
+const callConversationService = function(err, payload){
   const conversationPayload = payload.payload;
-  const req = payload.request;
-  const res = payload.response;
-  const next = payload.next;
+  reqPayload = payload;
 
   console.log('processed payload');
   console.log(conversationPayload);
 
-  //req.session.put();
   // Send the input to the conversation service
-  conversation.message(conversationPayload, (err, data) => {
-    if (err)
-      return next(err);
-    // save conversation-id if not exist
-    if(req.session[data.context.conversation_id] == undefined){
-      clarav2Session.setConversation(req, data.context.conversation_id);
-    }
-
-    //return res.status(err.code || 500).json(err);
-    return res.json(updateMessage(conversationPayload, data));
-  });
+  conversation.message(conversationPayload, messageCallback);
 }
 
 module.exports = function(app) {
