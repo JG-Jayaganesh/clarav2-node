@@ -1,4 +1,6 @@
 const Aerospike = require('aerospike');
+const async = require('async');
+
 const aerospikeConfig = require('../config/aerospike_config.js').aerospikeConfig();
 const aerospikeDBParams = require('../config/aerospike_config.js').aerospikeDBParams({nameSpace:'dev',set_name:'customer_data'});
 
@@ -36,7 +38,7 @@ exports.writeRecord = function (set, k, v, callback) {
  * @return {Object}          The response with the updated message
  */
 exports.readRecord = function (set, k, callback) {
- var key = new Aerospike.Key('dev', 'customer_data', 'abcde');
+ var key = new Aerospike.Key('dev', 'customer_data', {});
  client.get(key, function (error, record) {
   // Check for errors
   if (error) {
@@ -58,10 +60,13 @@ exports.queryRecord = function(nameSpace, set, fields, filterKey, filterVal, pay
     query.select(fields);
     query.where(Aerospike.filter.equal(filterKey, filterVal));
     var stream = query.foreach();
+
     //console.log(stream);
     stream.on('error', (error) => {
       console.log('ae error');
-      console.error(error)
+      console.error(error);
+      payload.error = error;
+      callback(error, payload);
       throw error
     });
     stream.on('data', (record)=> {
@@ -70,7 +75,12 @@ exports.queryRecord = function(nameSpace, set, fields, filterKey, filterVal, pay
       resultSet.push(record);
     });
     stream.on('end', ()=>{
+      console.log('~~~~~~~~~~~~');
+      //console.log(resultSet);
+      //payload.resultSet = {};
+      payload.resultSet = resultSet;
+      payload.error = {};
       //console.log('ae close');
-      callback(payload, resultSet);
+      callback(null, payload);
     });
 };
