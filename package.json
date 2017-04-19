@@ -22,9 +22,13 @@
     "aerospike": "^2.5.1",
     "aerospike-session-store": "^0.2.0",
     "async": "^2.3.0",
+    "axios": "^0.16.1",
+    "babel-polyfill": "^6.23.0",
     "body-parser": "^1.15.2",
     "dotenv": "^2.0.0",
     "express": "^4.14.0",
+    "keras-js": "^0.1.0",
+    "ndarray": "^1.0.18",
     "watson-developer-cloud": "^2.8.1"
   },
   "devDependencies": {
