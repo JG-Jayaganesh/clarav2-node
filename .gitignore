@@ -9,3 +9,5 @@ todos
 .gitignore
 db-backup
 notes
+data
+db-indexes

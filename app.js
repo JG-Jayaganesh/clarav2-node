@@ -4,7 +4,7 @@ const express = require('express'); // app server
 const bodyParser = require('body-parser'); // parser for post requests
 const Conversation = require('watson-developer-cloud/conversation/v1'); // watson sdk
 const clarav2Session = require('./lib/clarav2-session.js');
-const claraCarModels = require('./lib/car-models.js');
+//const claraCarModels = require('./lib/car-models.js');
 
 const aerospike = require('./db/aerospike.js');
 //const processUserInput = require('./process-user-input.js').processUserInput;
