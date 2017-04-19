@@ -5,6 +5,7 @@ const watson = require('watson-developer-cloud'); // watson sdk
 const processUserInput = require('../lib/process-user-input.js');
 const processClaraResponse = require('../lib/process-clara-response.js');
 const clarav2Session = require('../lib/clarav2-session.js');
+const dashbot = require('../lib/dashbot.js');
 
 let reqPayload = "";
 
@@ -89,6 +90,11 @@ const returnResponse = function(err, res, data){
   //console.log(data.resData);
   let payload = data.payload;
   let output = data.resData;
+  let dashbotInput = (payload.input.text || "").toString();
+  let dashbotOuput = (output.output.text || "").toString();
+
+  dashbot.saveToDashbot({incoming:dashbotInput, outgoing:dashbotOuput, session: data.request.session, sessionID: data.request.sessionID});
+
   //return res.status(err.code || 500).json(err);
   return res.json(updateMessage(payload, output));
 }
