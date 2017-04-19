@@ -80,13 +80,13 @@ const updateMessage = (input, response) => {
 };
 
 const returnResponse = function(err, res, data){
-  console.log('processed response');
+  //console.log('processed response');
   // if (err!=={} && err != undefined){
   //   console.log(err);
   //   return res.json(err);
   // }
   //console.log('0000000000FINAL RESPONSE00000000000');
-  console.log(data.resData);
+  //console.log(data.resData);
   let payload = data.payload;
   let output = data.resData;
   //return res.status(err.code || 500).json(err);
@@ -98,11 +98,11 @@ const messageCallback = (err, data) => {
   let sess = reqPayload.request.session;
   const res = reqPayload.response;
   reqPayload.resData = data;
-  console.log('-----from watson api-----------');
-  console.log(data);
+  //console.log('-----from watson api-----------');
+  //console.log(data);
   if(data!=undefined){
     // save conversation-id if not exist
-    if(data.context != undefined && sess['conversation-id'] != undefined){
+    if(data.context != undefined && sess['conversation-id'] == undefined){
       console.log('session created!');
       //console.log(reqPayload.request.session);
       clarav2Session.setConversation(reqPayload.request, data.context.conversation_id);
@@ -116,8 +116,8 @@ const callConversationService = function(err, payload){
   const conversationPayload = payload.payload;
   reqPayload = payload;
 
-  console.log('processed payload');
-  console.log(conversationPayload);
+  //console.log('processed payload');
+  //console.log(conversationPayload);
 
   // Send the input to the conversation service
   conversation.message(conversationPayload, messageCallback);
